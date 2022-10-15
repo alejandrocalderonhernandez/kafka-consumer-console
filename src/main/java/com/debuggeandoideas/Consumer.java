@@ -31,19 +31,22 @@ public class Consumer {
     }
 
     public void start() {
-        while (true) {
+        var count = 0;
+        do {
             try {
                 kafkaConsumer.subscribe(List.of(TOPIC));
-                    ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(20));
-                    records.forEach(r -> {
-                        var msg = String.format(
-                                "offset %s, partition %s, key %s, value %s", r.offset(), r.partition(), r.key(), r.value());
-                        log.info(msg);
-                    });
+                ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(20));
+                records.forEach(r -> {
+                    var msg = String.format(
+                            "offset %s, partition %s, key %s, value %s", r.offset(), r.partition(), r.key(), r.value());
+                    log.info(msg);
+
+                });
             } catch (KafkaException e) {
                 kafkaConsumer.close();
             }
-        }
+            count ++;
+        } while (count <= 20);
     }
 
     public static Consumer getInstance() {
